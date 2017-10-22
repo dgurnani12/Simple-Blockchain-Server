@@ -6,11 +6,10 @@ from time import time
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 from uuid import uuid4
-
+from argparse import ArgumentParser
 from flask import Flask, jsonify, request
 
 ### Blockchain class -- Start
-
 class Blockchain:
 
     ### Construction -- Start
@@ -29,7 +28,7 @@ class Blockchain:
         Add a new node to the list of nodes
         :param address: Address of node. Eg. 'http://192.168.0.5:5000'
         """
-
+	
         parsed_url = urlparse(address)
         self.nodes.add(parsed_url.netloc)
 
@@ -37,26 +36,30 @@ class Blockchain:
         """
         Determine if a given blockchain is valid
         :param chain: A blockchain
-        :return: True if valid, False if not
+        :return: True if valid, else False
         """
-
-        last_block = chain[0]
+	
+	# Initialize for iteration
+        previous_block = chain[0]
         current_index = 1
 
         while current_index < len(chain):
             block = chain[current_index]
+	
             print(f'{last_block}')
             print(f'{block}')
             print("\n-----------\n")
-            # Check that the hash of the block is correct
-            if block['previous_hash'] != self.hash(last_block):
+            
+	    # Check that the hash of the block is correct
+            if block['previous_hash'] != self.hash(previous_block):
                 return False
 
             # Check that the Proof of Work is correct
-            if not self.valid_proof(last_block['proof'], block['proof']):
+            if not self.valid_proof(previous_block['proof'], block['proof']):
                 return False
-
-            last_block = block
+	
+	    # Update interation varible after a single iteration
+            previous_block = block
             current_index += 1
 
         return True
@@ -77,7 +80,8 @@ class Blockchain:
         # Grab and verify the chains from all the nodes in our network
         for node in neighbours:
             response = requests.get(f'http://{node}/chain')
-
+		
+	    # Must have a valid response status as a precondition
             if response.status_code == 200:
                 length = response.json()['length']
                 chain = response.json()['chain']
@@ -168,11 +172,13 @@ class Blockchain:
         :param proof: Current Proof
         :return: True if correct, False if not.
         """
-
+	
         guess = f'{last_proof}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
-        return guess_hash[:4] == "0000"
-
+        
+	return guess_hash[:4] == "0000"
+    ### Python-Instance Methods -- End
+### Blockchain class -- End
 
 # Instantiate the Node
 app = Flask(__name__)
@@ -183,7 +189,7 @@ node_identifier = str(uuid4()).replace('-', '')
 # Instantiate the Blockchain
 blockchain = Blockchain()
 
-
+### Client access methods -- Start
 @app.route('/mine', methods=['GET'])
 def mine():
     # We run the proof of work algorithm to get the next proof...
@@ -193,6 +199,8 @@ def mine():
 
     # We must receive a reward for finding the proof.
     # The sender is "0" to signify that this node has mined a new coin.
+    # Miners amout is 1 because in this configuration a transaction amount 
+    # is stores as int (1 being the lowest posible value).
     blockchain.new_transaction(
         sender="0",
         recipient=node_identifier,
@@ -244,7 +252,8 @@ def register_nodes():
     nodes = values.get('nodes')
     if nodes is None:
         return "Error: Please supply a valid list of nodes", 400
-
+    
+    # Body can contain multiple nodes...
     for node in nodes:
         blockchain.register_node(node)
 
@@ -271,11 +280,9 @@ def consensus():
         }
 
     return jsonify(response), 200
-
+### Client access methods -- End
 
 if __name__ == '__main__':
-    from argparse import ArgumentParser
-
     parser = ArgumentParser()
     parser.add_argument('-p', '--port', default=5000, type=int, help='port to listen on')
     args = parser.parse_args()
