@@ -5,15 +5,15 @@ A simple blockchain server implemented in Python; uses the Flask Micro-Framework
 1) Requires:
       * [Python 3.6.X or above](https://www.python.org/downloads/)
       * [Pip](https://pip.pypa.io/en/stable/installing/)
-      * pipenv -- install using Pip '''$ pip install pipenv'''
+      * pipenv -- install using Pip '''BASH $ pip install pipenv'''
  
 2) Setup the environment:
-      * '''$ pipenv --python=python3.6'''
-      * '''$ pipenv install'''
+      * '''BASH $ pipenv --python=python3.6'''
+      * '''BASH $ pipenv install'''
 
 3) Run the Server:
-      * Default port: '''$  pipenv run python Server.py'''
-      * Specified port: '''$  pipenv run python Server.py [-p or --port <port #>]'''
+      * Default port: '''BASH $  pipenv run python Server.py'''
+      * Specified port: '''BASH $  pipenv run python Server.py [-p or --port <port #>]'''
 
 ## Credits: 
 1) Daniel Van Flymen's [tutorial](https://hackernoon.com/learn-blockchains-by-building-one-117428612f46) was very helpful for the implementation and some concepts.
