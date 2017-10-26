@@ -1,5 +1,5 @@
 # Simple-Blockchain-Server
-A simple blockchain server implemented in Python; uses the Flask Micro-Framework to make it easier to map endpoints to Python Functions. Clients can use http to communicate with the service that can be set up to run on a defined port. See installation instructions below:
+A simple blockchain (currency) server implemented in Python; uses the Flask Micro-Framework to make it easier to map endpoints to Python Functions. Clients can use http to communicate with the service that can be set up to run on a defined port. See installation instructions below:
 
 ## Installation:
 1) Requires:
